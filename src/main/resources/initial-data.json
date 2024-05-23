@@ -1,0 +1,62 @@
+{
+  "trainees": [
+    {
+      "id": 1,
+      "firstName": "Carlos",
+      "lastName": "Ramirez",
+      "userName": "john.doe",
+      "dateOfBirth": "1990-01-01",
+      "address": "123 Main St"
+    },
+    {
+      "id": 2,
+      "firstName": "Juan",
+      "lastName": "Hernandez",
+      "userName": "jane.doe",
+      "dateOfBirth": "1992-02-02",
+      "address": "456 Elm St"
+    }
+  ],
+  "trainers": [
+    {
+      "id": 1,
+      "firstName": "Maria",
+      "lastName": "Garcia",
+      "userName": "alice.smith",
+      "specialization": "Yoga"
+    },
+    {
+      "id": 2,
+      "firstName": "Manuel",
+      "lastName": "Martinez",
+      "userName": "bob.johnson",
+      "specialization": "Weightlifting"
+    }
+  ],
+  "trainings": [
+    {
+      "id": 1,
+      "traineeId": "1",
+      "trainerId": "1",
+      "trainingName": "Yoga Session",
+      "trainingType": {
+        "id": 1,
+        "name": "Yoga"
+      },
+      "trainingDate": "2022-01-01",
+      "trainingDuration": 60
+    },
+    {
+      "id": 2,
+      "traineeId": "2",
+      "trainerId": "2",
+      "trainingName": "Weightlifting Session",
+      "trainingType": {
+        "id": 2,
+        "name": "Weightlifting"
+      },
+      "trainingDate": "2022-01-02",
+      "trainingDuration": 90
+    }
+  ]
+}
