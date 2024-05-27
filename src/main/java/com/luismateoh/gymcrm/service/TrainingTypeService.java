@@ -1,17 +1,27 @@
 package com.luismateoh.gymcrm.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import com.luismateoh.gymcrm.dao.TrainingTypeDao;
 import com.luismateoh.gymcrm.domain.TrainingType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-/**
- * Service for TrainingType should support possibility to create/select TrainingType profile.
- */
-public interface TrainingTypeService {
+@Service
+public class TrainingTypeService {
 
-    /**
-     * Create a new TrainingType profile.
-     *
-     * @param typeName TrainingType name.
-     * @return TrainingType object created.
-     */
-    TrainingType getOrCreateTrainingType(String typeName);
+    private final TrainingTypeDao trainingTypeDao;
+
+    @Autowired
+    public TrainingTypeService(TrainingTypeDao trainingTypeDao) {
+        this.trainingTypeDao = trainingTypeDao;
+    }
+
+    public Optional<TrainingType> findByName(String name) {
+        List<TrainingType> trainingTypes = trainingTypeDao.findAll();
+        return trainingTypes.stream()
+                .filter(trainingType -> trainingType.getTrainingTypeName().equalsIgnoreCase(name))
+                .findFirst();
+    }
 }

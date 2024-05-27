@@ -1,17 +1,44 @@
 package com.luismateoh.gymcrm.domain;
 
+import java.io.Serializable;
+import java.util.Set;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class Trainer extends User {
+@Entity
+@Table(name = "trainers")
+public class Trainer implements Serializable {
 
-    private String specialization;
+    @Id
+    @Column(nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private Training training;
+    @ManyToOne
+    @JoinColumn(name = "specialization_id", nullable = false)
+    private TrainingType specialization;
 
-    private TrainingType trainingType;
+    @ManyToMany(mappedBy = "trainers")
+    private Set<Trainee> trainees;
 
-    private String userId;
+    @OneToMany(mappedBy = "trainer")
+    private Set<Training> trainings;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

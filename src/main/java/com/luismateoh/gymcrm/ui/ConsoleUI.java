@@ -2,8 +2,10 @@ package com.luismateoh.gymcrm.ui;
 
 import java.util.Scanner;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j(topic = "userInteraction")
 @Component
 public abstract class ConsoleUI {
     protected Scanner scanner;
@@ -12,23 +14,33 @@ public abstract class ConsoleUI {
         this.scanner = new Scanner(System.in);
     }
 
-    public abstract void start();
+    public abstract void start(String username);
 
     protected String getInput(String prompt, ValidatorFunction validator) {
         String input;
-        System.out.println(prompt);
+        log.info(prompt);
         while (true) {
             input = scanner.nextLine();
             if (validator.validate(input)) {
                 break;
             }
-            System.out.println("Invalid input. Please try again.");
+            log.info("Invalid input. Please try again.");
         }
         return input;
     }
 
     @FunctionalInterface
-    interface ValidatorFunction {
+    public interface ValidatorFunction {
         boolean validate(String text);
     }
+
+    protected boolean validateMenuOption(String input, int min, int max) {
+        try {
+            int option = Integer.parseInt(input);
+            return option >= min && option <= max;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 }
