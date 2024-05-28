@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,7 +46,7 @@ public class Trainee implements Serializable {
     )
     private Set<Trainer> trainers;
 
-    @OneToMany(mappedBy = "trainee")
+    @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Training> trainings;
 
     @OneToOne

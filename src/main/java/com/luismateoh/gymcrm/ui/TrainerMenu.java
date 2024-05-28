@@ -15,6 +15,7 @@ import com.luismateoh.gymcrm.dto.UserDTO;
 import com.luismateoh.gymcrm.service.TraineeService;
 import com.luismateoh.gymcrm.service.TrainerService;
 import com.luismateoh.gymcrm.service.TrainingService;
+import com.luismateoh.gymcrm.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -25,19 +26,24 @@ public class TrainerMenu extends ConsoleUI {
     private final TrainerService trainerService;
     private final TraineeService traineeService;
     private final TrainingService trainingService;
+    private final UserService userService;
 
-    public TrainerMenu(TrainerService trainerService, TraineeService traineeService, TrainingService trainingService) {
+    public TrainerMenu(TrainerService trainerService, TraineeService traineeService, TrainingService trainingService,
+                       UserService userService) {
         this.trainerService = trainerService;
         this.traineeService = traineeService;
         this.trainingService = trainingService;
+        this.userService = userService;
     }
 
     @Override
     public void start(String username) {
         TrainerDTO trainer = trainerService.findTrainerByUsername(username);
-        while (true) {
+        boolean keepLoggedIn = true;
+
+        while (keepLoggedIn) {
             displayMenu(username);
-            int choice = Integer.parseInt(getInput("Choose an option:", input -> validateMenuOption(input, 1, 8)));
+            int choice = Integer.parseInt(getInput("Choose an option:", input -> validateMenuOption(input, 1, 9)));
 
             switch (choice) {
                 case 1 -> viewProfile(trainer);
@@ -46,7 +52,9 @@ public class TrainerMenu extends ConsoleUI {
                 case 4 -> viewAssignedTrainees();
                 case 5 -> addTrainingSession(trainer);
                 case 6 -> listOwnTrainings(username);
-                case 7 -> {
+                case 7 -> listTrainings(username);
+                case 8 -> keepLoggedIn = !deactivateUser(username);
+                case 9 -> {
                     log.info("Logging out...");
                     return;
                 }
@@ -66,13 +74,16 @@ public class TrainerMenu extends ConsoleUI {
                 4. View assigned trainees
                 5. Add training session
                 6. List own trainings
-                7. Logout
+                7. List all trainings
+                8. Deactivate account
+                9. Logout
                 """, username);
         log.info(menu);
     }
 
     private void viewProfile(TrainerDTO trainer) {
         log.info(trainer.toString());
+        log.info(String.format("Password: %s", trainer.getUser().getPassword()));
     }
 
     private void updateProfile(TrainerDTO trainer) {
@@ -91,7 +102,7 @@ public class TrainerMenu extends ConsoleUI {
 
     private void changePassword(UserDTO user) {
         String newPassword = getInput("Enter new password:", input -> !input.trim().isEmpty());
-        trainerService.changePassword(user, newPassword);
+        userService.changePassword(user, newPassword);
         log.info("Password changed successfully.");
     }
 
@@ -147,31 +158,22 @@ public class TrainerMenu extends ConsoleUI {
         }
     }
 
+    private boolean deactivateUser(String username) {
+        userService.setActiveStatus(username, false);
+        log.info("User account deactivated. Returning to main menu...");
+        return true;
+    }
+
     public void listTrainings(String username) {
         Date fromDate = getInputDate("Enter from date (yyyy-mm-dd) or press Enter to skip:");
         Date toDate = getInputDate("Enter to date (yyyy-mm-dd) or press Enter to skip:");
         String trainerName = getInput("Enter trainer name or press Enter to skip:", input -> true);
-        String trainingType = getInput("Enter training type or press Enter to skip:", input -> true);
 
-        List<TrainingDTO> trainings = trainingService.getTraineeTrainings(username, fromDate, toDate, trainerName,
-                trainingType);
+        List<TrainingDTO> trainings = trainingService.getTrainerTrainings(username, fromDate, toDate, trainerName);
         if (trainings.isEmpty()) {
             log.info("No trainings found.");
         } else {
             trainings.forEach(training -> log.info(training.toString()));
-        }
-    }
-
-    private Date getInputDate(String prompt) {
-        String dateInput = getInput(prompt, input -> true);
-        if (dateInput.trim().isEmpty()) {
-            return null;
-        }
-        try {
-            return java.sql.Date.valueOf(dateInput);
-        } catch (IllegalArgumentException e) {
-            log.info("Invalid date format. Please try again.");
-            return getInputDate(prompt);
         }
     }
 

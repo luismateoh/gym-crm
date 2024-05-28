@@ -6,7 +6,6 @@ import com.luismateoh.gymcrm.dao.TrainerDao;
 import com.luismateoh.gymcrm.dao.UserDao;
 import com.luismateoh.gymcrm.domain.Trainer;
 import com.luismateoh.gymcrm.domain.TrainingType;
-import com.luismateoh.gymcrm.domain.User;
 import com.luismateoh.gymcrm.dto.TrainerDTO;
 import com.luismateoh.gymcrm.dto.UserDTO;
 import com.luismateoh.gymcrm.mapper.TrainerMapper;
@@ -52,7 +51,6 @@ public class TrainerService {
     public void updateTrainerProfile(TrainerDTO trainerDTO) {
         Trainer trainer = trainerMapper.trainerDTOToTrainer(trainerDTO);
 
-        // Fetch the TrainingType from the database
         String normalizedSpecialization = trainerDTO.getSpecialization().getTrainingTypeName();
         TrainingType trainingType = trainingTypeService.findByName(normalizedSpecialization)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -60,19 +58,6 @@ public class TrainerService {
 
         trainer.setSpecialization(trainingType);
         trainerDao.saveOrUpdate(trainer);
-    }
-
-    public void activateDeactivateTrainer(TrainerDTO trainerDTO, boolean isActive) {
-        UserDTO userDTO = trainerDTO.getUser();
-        userDTO.setIsActive(isActive);
-        User user = userMapper.userDTOToUser(userDTO);
-        userDao.saveOrUpdate(user);
-    }
-
-    public void changePassword(UserDTO userDTO, String newPassword) {
-        User user = userMapper.userDTOToUser(userDTO);
-        user.setPassword(newPassword);
-        userDao.saveOrUpdate(user);
     }
 
     public List<TrainerDTO> findAllTrainers() {

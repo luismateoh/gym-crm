@@ -1,5 +1,6 @@
 package com.luismateoh.gymcrm.ui;
 
+import java.util.Date;
 import java.util.Scanner;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,4 +44,16 @@ public abstract class ConsoleUI {
         }
     }
 
+    Date getInputDate(String prompt) {
+        String dateInput = getInput(prompt, input -> true);
+        if (dateInput.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return java.sql.Date.valueOf(dateInput);
+        } catch (IllegalArgumentException e) {
+            log.info("Invalid date format. Please try again.");
+            return getInputDate(prompt);
+        }
+    }
 }

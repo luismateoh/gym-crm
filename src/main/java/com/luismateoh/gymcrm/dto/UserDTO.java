@@ -33,6 +33,6 @@ public class UserDTO {
     @Override
     public String toString() {
 
-        return "User -> " + " ID: " + id + ", First Name: " + firstName + ", Last Name: " + lastName + ", Username: " + username + ", Password: " + password + ", Active: " + isActive;
+        return "User -> " + " ID: " + id + ", First Name: " + firstName + ", Last Name: " + lastName + ", Username: " + username + ", Active: " + isActive;
     }
 }

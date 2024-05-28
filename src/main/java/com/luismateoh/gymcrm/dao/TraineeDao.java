@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class TraineeDao extends GenericDaoImpl<Trainee, Long> {
+
     public TraineeDao(SessionFactory sessionFactory) {
         super(Trainee.class, sessionFactory);
     }
@@ -17,6 +18,17 @@ public class TraineeDao extends GenericDaoImpl<Trainee, Long> {
             Query<Trainee> query = session.createQuery("SELECT t FROM Trainee t JOIN t.user u WHERE u.username = :username", Trainee.class);
             query.setParameter("username", username);
             return query.uniqueResult();
+        }
+    }
+
+    public void deleteByUsername(String username) {
+        try (Session session = sessionFactory.openSession()) {
+            var transaction = session.beginTransaction();
+            Trainee trainee = findByUsername(username);
+            if (trainee != null) {
+                session.remove(trainee);
+            }
+            transaction.commit();
         }
     }
 }

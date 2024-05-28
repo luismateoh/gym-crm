@@ -33,8 +33,14 @@ public class RegisterMenu extends ConsoleUI {
             int choice = Integer.parseInt(getInput("Choose an option:", input -> validateMenuOption(input, 1, 3)));
 
             switch (choice) {
-                case 1 -> registerTrainer();
-                case 2 -> registerTrainee();
+                case 1 -> {
+                    registerTrainer();
+                    return;
+                }
+                case 2 -> {
+                    registerTrainee();
+                    return;
+                }
                 case 3 -> {
                     log.info("Exiting...");
                     return;
@@ -79,6 +85,7 @@ public class RegisterMenu extends ConsoleUI {
             trainer = trainerService.createTrainer(firstName, lastName, specialization);
             log.info("Trainer registered successfully.");
             log.info(trainer.toString());
+            log.info(String.format("Password: %s", trainer.getUser().getPassword()));
         } catch (IllegalArgumentException e) {
             log.error("Error registering trainer: {}", e.getMessage());
         }
@@ -111,6 +118,7 @@ public class RegisterMenu extends ConsoleUI {
             trainee = traineeService.createTrainee(firstName, lastName, dateOfBirth, address);
             log.info("Trainee registered successfully.");
             log.info(trainee.toString());
+            log.info(String.format("Password: %s", trainee.getUser().getPassword()));
         } catch (IllegalArgumentException e) {
             log.error("Error registering trainee: {}", e.getMessage());
         }

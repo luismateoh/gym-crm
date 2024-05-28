@@ -12,6 +12,7 @@ public class TrainerDao extends GenericDaoImpl<Trainer, Long> {
     public TrainerDao(SessionFactory sessionFactory) {
         super(Trainer.class, sessionFactory);
     }
+
     public Trainer findByUsername(String username) {
         try (Session session = sessionFactory.openSession()) {
             Query<Trainer> query = session.createQuery("SELECT t FROM Trainer t JOIN t.user u WHERE u.username = :username", Trainer.class);

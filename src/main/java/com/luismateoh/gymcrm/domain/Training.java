@@ -48,7 +48,4 @@ public class Training implements Serializable {
     @Column(name = "training_duration", nullable = false)
     private Integer trainingDuration;
 
-
-
-
 }

@@ -59,48 +59,42 @@ public class MainMenu extends ConsoleUI {
     }
 
     private void login() {
-        // Prompt for username and password
         String user = getInput("Enter username:", input -> !input.trim().isEmpty());
         String password = getInput("Enter password:", input -> !input.trim().isEmpty());
 
-        // Attempt to retrieve user details
         Optional<UserDTO> userDetailsOpt = userService.findByUsername(user);
-        if (!userDetailsOpt.isPresent()) {
+        if (userDetailsOpt.isEmpty()) {
             log.info("Invalid username or password. Please try again.");
             return;
         }
 
         UserDTO userDetails = userDetailsOpt.get();
 
-        // Check if user is active
-        if (!userDetails.getIsActive()) {
+        if (Boolean.FALSE.equals(userDetails.getIsActive())) {
             log.info("User is inactive. Please enter your password again to reactivate your account.");
             String confirmPassword = getInput("Confirm password:", input -> !input.trim().isEmpty());
             if (userService.validatePassword(userDetails, confirmPassword)) {
-                userService.activateUser(user);
+                userService.setActiveStatus(user, true);
                 log.info("User reactivated successfully.");
-                login(); // Recursive call to login after reactivation
+                login();
             } else {
                 log.info("Passwords do not match. Reactivation failed.");
                 return;
             }
         }
 
-        // Attempt to log in with provided credentials
         if (userService.login(user, password).isPresent()) {
-            // Route user based on type
             if (traineeMenu.isTrainee(user)) {
                 traineeMenu.start(user);
             } else if (trainerMenu.isTrainer(user)) {
                 trainerMenu.start(user);
             } else {
-                log.info("User type not recognized.");
+                log.info("Invalid username or password.");
             }
         } else {
             log.info("Invalid username or password. Please try again.");
         }
     }
-
 
     private void startRegisterMenu(String username) {
         registerMenu.start(username);

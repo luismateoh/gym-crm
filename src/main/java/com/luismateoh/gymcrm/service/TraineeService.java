@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import com.luismateoh.gymcrm.dao.TraineeDao;
 import com.luismateoh.gymcrm.dao.UserDao;
 import com.luismateoh.gymcrm.domain.Trainee;
-import com.luismateoh.gymcrm.domain.User;
 import com.luismateoh.gymcrm.dto.TraineeDTO;
 import com.luismateoh.gymcrm.dto.UserDTO;
 import com.luismateoh.gymcrm.mapper.TraineeMapper;
@@ -51,22 +50,8 @@ public class TraineeService {
         traineeDao.saveOrUpdate(trainee);
     }
 
-    public void activateDeactivateTrainee(TraineeDTO traineeDTO, boolean isActive) {
-        UserDTO userDTO = traineeDTO.getUser();
-        userDTO.setIsActive(isActive);
-        User user = userMapper.userDTOToUser(userDTO);
-        userDao.saveOrUpdate(user);
-    }
-
-    public void changePassword(UserDTO userDTO, String newPassword) {
-        User user = userMapper.userDTOToUser(userDTO);
-        user.setPassword(newPassword);
-        userDao.saveOrUpdate(user);
-    }
-
     public void deleteTraineeByUsername(String username) {
-        Trainee trainee = traineeDao.findByUsername(username);
-        traineeDao.delete(trainee);
+        traineeDao.deleteByUsername(username);
     }
 
     public List<TraineeDTO> findAllTrainees() {

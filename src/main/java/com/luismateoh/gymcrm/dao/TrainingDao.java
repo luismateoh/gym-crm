@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class TrainingDao extends GenericDaoImpl<Training, Long> {
+
     public TrainingDao(SessionFactory sessionFactory) {
         super(Training.class, sessionFactory);
     }
