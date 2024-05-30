@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.luismateoh.gymcrm.dto.TraineeDTO;
 import com.luismateoh.gymcrm.dto.TrainerDTO;
@@ -43,7 +44,7 @@ public class TrainerMenu extends ConsoleUI {
 
         while (keepLoggedIn) {
             displayMenu(username);
-            int choice = Integer.parseInt(getInput("Choose an option:", input -> validateMenuOption(input, 1, 9)));
+            int choice = Integer.parseInt(getInput("Choose an option:", input -> validateMenuOption(input, 1, 10)));
 
             switch (choice) {
                 case 1 -> viewProfile(trainer);
@@ -54,7 +55,8 @@ public class TrainerMenu extends ConsoleUI {
                 case 6 -> listOwnTrainings(username);
                 case 7 -> listTrainings(username);
                 case 8 -> keepLoggedIn = !deactivateUser(username);
-                case 9 -> {
+                case 9 -> updateTraineeTrainers();
+                case 10 -> {
                     log.info("Logging out...");
                     return;
                 }
@@ -76,7 +78,8 @@ public class TrainerMenu extends ConsoleUI {
                 6. List own trainings
                 7. List all trainings
                 8. Deactivate account
-                9. Logout
+                9. Update trainee trainers
+                10. Logout
                 """, username);
         log.info(menu);
     }
@@ -174,6 +177,32 @@ public class TrainerMenu extends ConsoleUI {
             log.info("No trainings found.");
         } else {
             trainings.forEach(training -> log.info(training.toString()));
+        }
+    }
+
+    private void updateTraineeTrainers() {
+        String traineeUsername = getInput("Enter trainee username:", input -> !input.trim().isEmpty());
+        TraineeDTO trainee = traineeService.findTraineeByUsername(traineeUsername);
+        if (trainee == null) {
+            log.info("Trainee not found.");
+            return;
+        }
+
+        List<TrainerDTO> unassignedTrainers = trainerService.getUnassignedTrainers(traineeUsername);
+        log.info("Unassigned Trainers:");
+        for (TrainerDTO trainer : unassignedTrainers) {
+            log.info(trainer.toString());
+        }
+
+        String trainerUsernames = getInput("Enter trainer usernames (comma separated) to assign:",
+                input -> !input.trim().isEmpty());
+        List<String> trainerUsernameList = Stream.of(trainerUsernames.split(",")).map(String::trim).toList();
+
+        try {
+            trainerService.updateTraineeTrainers(traineeUsername, trainerUsernameList);
+            log.info("Trainee trainers updated successfully.");
+        } catch (IllegalArgumentException e) {
+            log.info(e.getMessage());
         }
     }
 

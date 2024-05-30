@@ -1,9 +1,13 @@
 package com.luismateoh.gymcrm.service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.luismateoh.gymcrm.dao.TraineeDao;
 import com.luismateoh.gymcrm.dao.TrainerDao;
 import com.luismateoh.gymcrm.dao.UserDao;
+import com.luismateoh.gymcrm.domain.Trainee;
 import com.luismateoh.gymcrm.domain.Trainer;
 import com.luismateoh.gymcrm.domain.TrainingType;
 import com.luismateoh.gymcrm.dto.TrainerDTO;
@@ -16,13 +20,16 @@ import org.springframework.stereotype.Service;
 public class TrainerService {
     private final TrainerDao trainerDao;
     private final UserDao userDao;
+    private final TraineeDao traineeDao;
     private final TrainingTypeService trainingTypeService;
     private static final TrainerMapper trainerMapper = TrainerMapper.INSTANCE;
     private static final UserMapper userMapper = UserMapper.INSTANCE;
 
-    public TrainerService(TrainerDao trainerDao, UserDao userDao, TrainingTypeService trainingTypeService) {
+    public TrainerService(TrainerDao trainerDao, UserDao userDao, TraineeDao traineeDao,
+                          TrainingTypeService trainingTypeService) {
         this.trainerDao = trainerDao;
         this.userDao = userDao;
+        this.traineeDao = traineeDao;
         this.trainingTypeService = trainingTypeService;
     }
 
@@ -62,5 +69,23 @@ public class TrainerService {
 
     public List<TrainerDTO> findAllTrainers() {
         return trainerDao.findAll().stream().map(trainerMapper::trainerToTrainerDTO).toList();
+    }
+
+    public List<TrainerDTO> getUnassignedTrainers(String traineeUsername) {
+        Trainee trainee = traineeDao.findByUsername(traineeUsername);
+        Set<Trainer> assignedTrainers = trainee.getTrainers();
+        List<Trainer> allTrainers = trainerDao.findAll();
+
+        return allTrainers.stream()
+                .filter(trainer -> !assignedTrainers.contains(trainer))
+                .map(trainerMapper::trainerToTrainerDTO)
+                .toList();
+    }
+
+    public void updateTraineeTrainers(String traineeUsername, List<String> trainerUsernames) {
+        Trainee trainee = traineeDao.findByUsername(traineeUsername);
+        Set<Trainer> trainers = trainerUsernames.stream().map(trainerDao::findByUsername).collect(Collectors.toSet());
+        trainee.setTrainers(trainers);
+        traineeDao.saveOrUpdate(trainee);
     }
 }
