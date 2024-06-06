@@ -1,42 +1,60 @@
 package com.luismateoh.gymcrm.service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.luismateoh.gymcrm.dao.TraineeDao;
+import com.luismateoh.gymcrm.dao.UserDao;
 import com.luismateoh.gymcrm.domain.Trainee;
 import com.luismateoh.gymcrm.dto.TraineeDTO;
+import com.luismateoh.gymcrm.dto.UserDTO;
+import com.luismateoh.gymcrm.mapper.TraineeMapper;
+import com.luismateoh.gymcrm.mapper.UserMapper;
+import org.springframework.stereotype.Service;
 
-/**
- * TraineeService
- * Trainee Service class should support possibility to create/update/delete/select Trainee profile.
- */
-public interface TraineeService {
+@Service
+public class TraineeService {
+    private final TraineeDao traineeDao;
+    private final UserDao userDao;
+    private static final TraineeMapper traineeMapper = TraineeMapper.INSTANCE;
+    private static final UserMapper userMapper = UserMapper.INSTANCE;
 
-    /**
-     * Create a new Trainee profile.
-     *
-     * @param traineeDTO TraineeDTO object to be created.
-     * @return Trainee object created.
-     */
-    Trainee createTrainee(TraineeDTO traineeDTO);
+    public TraineeService(TraineeDao traineeDao, UserDao userDao) {
+        this.traineeDao = traineeDao;
+        this.userDao = userDao;
+    }
 
-    /**
-     * Update an existing Trainee profile.
-     *
-     * @param traineeDTO Trainee object to be updated.
-     * @return Trainee object updated.
-     */
-    Trainee updateTrainee(Trainee traineeDTO);
+    public TraineeDTO createTrainee(String firstName, String lastName, String dateOfBirth, String address) {
+        UserService userService = new UserService(userDao);
+        String username = userService.generateUsername(firstName, lastName);
+        String password = userService.generatePassword();
+        UserDTO userDTO = userService.registerUser(firstName, lastName, username, password, true);
 
-    /**
-     * Delete an existing Trainee profile.
-     *
-     * @param traineeId Trainee object to be deleted.
-     */
-    void deleteTrainee(Long traineeId);
+        Trainee trainee = new Trainee();
+        trainee.setUser(userMapper.userDTOToUser(userDTO));
+        trainee.setDateOfBirth(LocalDate.parse(dateOfBirth));
+        trainee.setAddress(address);
 
-    /**
-     * Find a Trainee profile by its id.
-     *
-     * @param traineeId Trainee id.
-     * @return Trainee object found.
-     */
-    Trainee findTraineeById(Long traineeId);
+        Trainee savedTrainee = traineeDao.saveOrUpdate(trainee);
+        return traineeMapper.traineeToTraineeDTO(savedTrainee);
+    }
+
+    public TraineeDTO findTraineeByUsername(String username) {
+        Trainee trainee = traineeDao.findByUsername(username);
+        return traineeMapper.traineeToTraineeDTO(trainee);
+    }
+
+    public void updateTraineeProfile(TraineeDTO traineeDTO) {
+        Trainee trainee = traineeMapper.traineeDTOToTrainee(traineeDTO);
+        traineeDao.saveOrUpdate(trainee);
+    }
+
+    public void deleteTraineeByUsername(String username) {
+        traineeDao.deleteByUsername(username);
+    }
+
+    public List<TraineeDTO> findAllTrainees() {
+        return traineeDao.findAll().stream().map(traineeMapper::traineeToTraineeDTO).collect(Collectors.toList());
+    }
 }

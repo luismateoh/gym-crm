@@ -19,33 +19,45 @@ repositories {
 dependencies {
     //--- spring dependencies
     implementation 'org.springframework:spring-context:6.1.5'
+    implementation 'org.springframework:spring-orm:6.1.5'
     testImplementation 'org.springframework:spring-test:6.1.5'
 
     //--- test dependencies
-    // Spock Core test dependencies
+        // Spock Core test dependencies
     testImplementation 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
     testImplementation 'org.spockframework:spock-junit4:2.4-M1-groovy-4.0'
-    // Spring Spock test dependencies
+        // Spring Spock test dependencies
     testImplementation 'org.spockframework:spock-spring:2.4-M1-groovy-4.0'
-    // Junit dependencies
+        // Junit dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    // Groovy dependencies
+        // Groovy dependencies
     implementation 'org.apache.groovy:groovy:4.0.4'
+
+    //--- Hibernate
+    implementation 'org.hibernate:hibernate-core:6.4.4.Final'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+    implementation 'org.glassfish:jakarta.el:4.0.2'
 
     //--- Utils
     implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+        // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
-    //--- logging
+    //--- Logging
     implementation 'org.slf4j:slf4j-api:2.0.13'
     implementation 'org.slf4j:slf4j-log4j12:2.0.13'
     implementation 'org.apache.logging.log4j:log4j:2.21.1'
 
-    //--- validation
+    //--- Validation
     implementation 'jakarta.validation:jakarta.validation-api:3.1.0-M2'
 
+    //--- In Memory Database
+    implementation 'com.h2database:h2:2.2.224'
 }
 
 test {
